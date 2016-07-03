@@ -14,7 +14,7 @@ public class WildCard extends Card {
 	 * @param point
 	 */
 	public WildCard(boolean drawfour) {
-		super(Color.BLACK, 50);
+		super(50);
 		this.drawfour = drawfour;
 	}
 

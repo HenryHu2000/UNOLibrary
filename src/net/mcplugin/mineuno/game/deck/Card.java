@@ -8,23 +8,13 @@ package net.mcplugin.mineuno.game.deck;
  *
  */
 public abstract class Card {
-	protected final Color color;
 	protected final int point;
 
 	/**
-	 * @param color
 	 * @param point
 	 */
-	public Card(Color color, int point) {
-		this.color = color;
+	public Card(int point) {
 		this.point = point;
-	}
-
-	/**
-	 * @return the color
-	 */
-	public Color getColor() {
-		return color;
 	}
 
 	/**
