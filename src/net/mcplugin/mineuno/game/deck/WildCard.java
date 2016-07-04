@@ -11,7 +11,7 @@ public class WildCard extends Card {
 	private final boolean drawfour;
 
 	/**
-	 * @param point
+	 * @param drawfour
 	 */
 	public WildCard(boolean drawfour) {
 		super(50);
