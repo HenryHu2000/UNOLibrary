@@ -7,7 +7,7 @@ package net.mcplugin.mineuno.game.deck;
  * @author Henry Hu
  *
  */
-public class NumberCard extends Card implements Colorable {
+public class NumberCard extends AbstractCard implements Colorable {
 	private final Color color;
 
 	/**
@@ -23,10 +23,14 @@ public class NumberCard extends Card implements Colorable {
 	}
 
 	/**
-	 * @return the color
+	 * {@inheritDoc}
 	 */
 	public Color getColor() {
 		return color;
 	}
 
+	@Override
+	public String toString() {
+		return (color.toString() + point);
+	}
 }

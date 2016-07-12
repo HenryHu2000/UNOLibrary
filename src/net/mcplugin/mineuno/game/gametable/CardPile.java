@@ -11,55 +11,43 @@ import net.mcplugin.mineuno.game.deck.*;
  * @author Henry Hu
  *
  */
-public class CardPile {
-	private Stack<Card> stack = new Stack<Card>();
-
+public class CardPile extends Stack<AbstractCard> {
 	/**
-	 * @return the stack to store the cards in the card pile
+	 * 
 	 */
-	public Stack<Card> getStack() {
-		return stack;
-	}
-
-	/**
-	 * @param stack
-	 *            to store the cards in the card pile
-	 */
-	public void setStack(Stack<Card> stack) {
-		this.stack = stack;
-	}
+	private static final long serialVersionUID = 7412631325157467969L;
 
 	public CardPile() {
-		// Wait for completing
+		// Wait to complete
 	}
 
-	public CardPile(Stack<Card> stack) {
-		setStack(stack);
+	public CardPile(Stack<AbstractCard> stack) {
+		this.addAll(stack);
 	}
 
 	/**
 	 * Restore the card pile to standard order of UNO
 	 */
 	public void initialize() {
-		stack.clear();
+		clear();
 		for (Color color : Color.values()) {
 			// Add card number zero
-			stack.push(new NumberCard(color, 0));
+			push(new NumberCard(color, 0));
 
 			for (int i = 0; i < 2; i++) {
 				// Add other number cards
 				for (int j = 1; j < 10; j++) {
-					stack.push(new NumberCard(color, j));
+					push(new NumberCard(color, j));
 				}
 				// Add action cards
 				for (ActionType action : ActionType.values()) {
-					stack.push(new ActionCard(color, action));
+					push(new ActionCard(color, action));
 				}
 
 			}
 			// Add wild cards
-			stack.push(new WildCard(false));
-			stack.push(new WildCard(true));
+			push(new WildCard(false));
+			push(new WildCard(true));
 		}
 
 	}

@@ -9,7 +9,7 @@ package net.mcplugin.mineuno.game.deck;
  * @author Henry Hu
  *
  */
-public abstract class Card {
+public abstract class AbstractCard {
 	/**
 	 * The point of the UNO card.
 	 */
@@ -19,7 +19,7 @@ public abstract class Card {
 	 * @param point
 	 *            of the UNO card
 	 */
-	public Card(int point) {
+	public AbstractCard(int point) {
 		this.point = point;
 	}
 

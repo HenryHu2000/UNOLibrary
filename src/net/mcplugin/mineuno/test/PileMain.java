@@ -8,7 +8,7 @@ public class PileMain {
 		// TODO Auto-generated method stub
 		CardPile pile = new CardPile();
 		pile.initialize();
-		System.out.println(pile.getStack().size());
+		System.out.println(pile.size());
 
 	}
 

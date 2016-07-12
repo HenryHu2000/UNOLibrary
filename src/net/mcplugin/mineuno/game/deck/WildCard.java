@@ -7,7 +7,7 @@ package net.mcplugin.mineuno.game.deck;
  * @author Henry Hu
  *
  */
-public class WildCard extends Card {
+public class WildCard extends AbstractCard {
 	private final boolean drawfour;
 
 	/**

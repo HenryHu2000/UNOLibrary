@@ -9,7 +9,7 @@ package net.mcplugin.mineuno.game.deck;
  * @author Henry Hu
  *
  */
-public class ActionCard extends Card implements Colorable {
+public class ActionCard extends AbstractCard implements Colorable {
 	private final Color color;
 	private final ActionType action;
 
@@ -34,10 +34,14 @@ public class ActionCard extends Card implements Colorable {
 	}
 
 	/**
-	 * @return the color
+	 * {@inheritDoc}
 	 */
 	public Color getColor() {
 		return color;
 	}
 
+	@Override
+	public String toString() {
+		return (color.toString() + action.toString());
+	}
 }
