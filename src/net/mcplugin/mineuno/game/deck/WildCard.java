@@ -12,6 +12,8 @@ public class WildCard extends Card {
 
 	/**
 	 * @param drawfour
+	 *            whether the wild card has the effect to make the next player
+	 *            draw four cards
 	 */
 	public WildCard(boolean drawfour) {
 		super(50);
@@ -19,7 +21,8 @@ public class WildCard extends Card {
 	}
 
 	/**
-	 * @return the draw four
+	 * @return true if the wild card has the effect to make the next player draw
+	 *         four cards
 	 */
 	public boolean isDrawfour() {
 		return drawfour;

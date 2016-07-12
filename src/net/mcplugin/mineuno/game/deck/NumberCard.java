@@ -12,7 +12,9 @@ public class NumberCard extends Card implements Colorable {
 
 	/**
 	 * @param color
+	 *            of the card
 	 * @param point
+	 *            of the card
 	 */
 	public NumberCard(Color color, int point) {
 		super(point);

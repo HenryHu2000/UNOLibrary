@@ -15,7 +15,7 @@ public class CardPile {
 	private Stack<Card> stack = new Stack<Card>();
 
 	/**
-	 * @return the stack
+	 * @return the stack to store the cards in the card pile
 	 */
 	public Stack<Card> getStack() {
 		return stack;
@@ -23,7 +23,7 @@ public class CardPile {
 
 	/**
 	 * @param stack
-	 *            the stack to set
+	 *            to store the cards in the card pile
 	 */
 	public void setStack(Stack<Card> stack) {
 		this.stack = stack;
@@ -37,6 +37,9 @@ public class CardPile {
 		setStack(stack);
 	}
 
+	/**
+	 * Restore the card pile to standard order of UNO
+	 */
 	public void initialize() {
 		stack.clear();
 		for (Color color : Color.values()) {

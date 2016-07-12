@@ -4,6 +4,8 @@
 package net.mcplugin.mineuno.game.deck;
 
 /**
+ * a type of cards that can invoke an action
+ * 
  * @author Henry Hu
  *
  */
@@ -13,7 +15,9 @@ public class ActionCard extends Card implements Colorable {
 
 	/**
 	 * @param color
-	 * @param point
+	 *            of the card
+	 * @param action
+	 *            of the card
 	 */
 	public ActionCard(Color color, ActionType action) {
 		super(20);
