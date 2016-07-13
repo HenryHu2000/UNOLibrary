@@ -11,6 +11,8 @@ package net.mcplugin.mineuno.game.deck;
  */
 public interface Colorable {
 	/**
+	 * Get the color of the colored card
+	 * 
 	 * @return the color
 	 */
 	public Color getColor();

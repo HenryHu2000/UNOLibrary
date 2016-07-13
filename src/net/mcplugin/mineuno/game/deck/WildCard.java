@@ -4,6 +4,7 @@
 package net.mcplugin.mineuno.game.deck;
 
 /**
+ * 
  * @author Henry Hu
  *
  */
@@ -26,5 +27,22 @@ public class WildCard extends AbstractCard {
 	 */
 	public boolean isDrawfour() {
 		return drawfour;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean matches(Colorable card) {
+
+		// Wild cards can match any other cards.
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		if (!isDrawfour())
+			return "WILD";
+		else
+			return "WILD DRAWFOUR";
 	}
 }

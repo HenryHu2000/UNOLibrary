@@ -36,12 +36,28 @@ public class ActionCard extends AbstractCard implements Colorable {
 	/**
 	 * {@inheritDoc}
 	 */
+	public boolean matches(Colorable card) {
+
+		if (this.color == card.getColor()) {
+			return true;
+		} else if (card instanceof ActionCard) {
+			ActionCard numCard = (ActionCard) card;
+			if (this.action == numCard.getAction())
+				return true;
+		}
+		// more codes needed
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public Color getColor() {
 		return color;
 	}
 
 	@Override
 	public String toString() {
-		return (color.toString() + action.toString());
+		return (color.toString() + " " + action.toString());
 	}
 }
