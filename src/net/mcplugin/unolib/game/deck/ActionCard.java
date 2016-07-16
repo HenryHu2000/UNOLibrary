@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.mcplugin.mineuno.game.deck;
+package net.mcplugin.unolib.game.deck;
 
 /**
  * a type of cards that can invoke an action

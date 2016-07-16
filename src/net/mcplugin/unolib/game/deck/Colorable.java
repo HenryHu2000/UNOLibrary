@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.mcplugin.mineuno.game.deck;
+package net.mcplugin.unolib.game.deck;
 
 /**
  * Any class which implements this interface has a color

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.mcplugin.mineuno.game.deck;
+package net.mcplugin.unolib.game.deck;
 
 /**
  * UNO cards involved in game.

@@ -1,9 +1,14 @@
 /**
  * 
  */
-package net.mcplugin.mineuno.game.deck;
+package net.mcplugin.unolib.game.deck;
 
 /**
+ * Player declares next color to be matched. If draw four is enabled, next
+ * player in sequence draws four cards and loses a turn. May be legally played
+ * only if the player has no cards of the current color, not counting wild
+ * cards; cards in a color different from the current color do not count even if
+ * they have the with the same number or symbol.
  * 
  * @author Henry Hu
  *

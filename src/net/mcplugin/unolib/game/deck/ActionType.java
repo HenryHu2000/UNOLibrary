@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.mcplugin.mineuno.game.deck;
+package net.mcplugin.unolib.game.deck;
 
 /**
  * Three types of actions for action cards.

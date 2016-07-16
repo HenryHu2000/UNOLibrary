@@ -1,11 +1,12 @@
 /**
  * 
  */
-package net.mcplugin.mineuno.game.gametable;
+package net.mcplugin.unolib.game.gametable;
 
+import java.util.Collections;
 import java.util.Stack;
 
-import net.mcplugin.mineuno.game.deck.*;
+import net.mcplugin.unolib.game.deck.*;
 
 /**
  * @author Henry Hu
@@ -49,6 +50,25 @@ public class CardPile extends Stack<AbstractCard> {
 			push(new WildCard(false));
 			push(new WildCard(true));
 		}
+		this.shuffle();
+
+	}
+
+	/**
+	 * shuffle the card pile
+	 */
+	public void shuffle() {
+		Collections.shuffle(this);
+	}
+
+	@Override
+	public String toString() {
+		String str = "";
+		for (AbstractCard card : this) {
+			str += (card.toString() + ",");
+		}
+
+		return str.substring(0, str.length() - 1);
 
 	}
 
