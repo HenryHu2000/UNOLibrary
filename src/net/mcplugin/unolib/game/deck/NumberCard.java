@@ -32,14 +32,21 @@ public class NumberCard extends AbstractCard implements Colorable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean matches(Colorable card) {
-
-		if (this.color == card.getColor()) {
-			return true;
-		} else if (card instanceof NumberCard) {
-			NumberCard numCard = (NumberCard) card;
-			if (this.point == numCard.getPoint())
+	public boolean matches(AbstractCard card) {
+		if (card instanceof Colorable) {
+			Colorable coloredCard = (Colorable) card;
+			if (this.color == coloredCard.getColor()) {
 				return true;
+			} else if (coloredCard instanceof NumberCard) {
+				NumberCard numCard = (NumberCard) coloredCard;
+				if (this.point == numCard.getPoint())
+					return true;
+			}
+		} else if (card instanceof WildCard) {
+			WildCard wild = (WildCard) card;
+			if (this.color == wild.getDeclaredColor()) {
+				return true;
+			}
 		}
 		// more codes needed
 		return false;

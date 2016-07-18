@@ -6,7 +6,12 @@ package net.mcplugin.unolib.game.gametable;
 import java.util.Collections;
 import java.util.Stack;
 
-import net.mcplugin.unolib.game.deck.*;
+import net.mcplugin.unolib.game.deck.AbstractCard;
+import net.mcplugin.unolib.game.deck.ActionCard;
+import net.mcplugin.unolib.game.deck.ActionType;
+import net.mcplugin.unolib.game.deck.Color;
+import net.mcplugin.unolib.game.deck.NumberCard;
+import net.mcplugin.unolib.game.deck.WildCard;
 
 /**
  * @author Henry Hu
@@ -18,6 +23,9 @@ public class CardPile extends Stack<AbstractCard> {
 	 */
 	private static final long serialVersionUID = 7412631325157467969L;
 
+	/**
+	 * Create an empty card pile.
+	 */
 	public CardPile() {
 		// Wait to complete
 	}

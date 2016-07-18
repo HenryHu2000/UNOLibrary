@@ -4,6 +4,11 @@
 package net.mcplugin.unolib.game.gametable;
 
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
+
+import net.mcplugin.unolib.game.deck.AbstractCard;
+import net.mcplugin.unolib.game.deck.Colorable;
 
 /**
  * A class to represent players involved in the card game.
@@ -13,7 +18,7 @@ import java.util.ArrayList;
  */
 public class GamePlayer {
 	private final String name;
-	private CardPile pile = new CardPile();
+	private TreeSet<AbstractCard> hand = new TreeSet<AbstractCard>();
 	private UNOGame game = null;
 
 	/**
@@ -26,30 +31,110 @@ public class GamePlayer {
 	}
 
 	/**
+	 * Create a player with a given set of cards in hand
+	 * 
 	 * @param name
 	 *            of the player
-	 * @param pile
+	 * @param hand
 	 *            of the player's cards
 	 */
-	public GamePlayer(String name, CardPile pile) {
+	public GamePlayer(String name, TreeSet<AbstractCard> pile) {
 		// TODO Auto-generated constructor stub
 		this.name = name;
-		this.pile = pile;
+		this.hand = pile;
 	}
 
 	/**
-	 * @return the pile
+	 * Add a card to player's hand.
+	 * 
+	 * @param card
+	 *            to be added to player's hand
 	 */
-	public CardPile getPile() {
-		return pile;
+	public void addCard(AbstractCard card) {
+		hand.add(card);
 	}
 
 	/**
+	 * 
+	 * @param card
+	 *            to discard
+	 * @return true if the card is successfully discarded
+	 */
+	public boolean discard(AbstractCard card, CardPile discardPile) {
+		if (this.remove(card)) {
+			discardPile.push(card);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Draw a card from the given card pile.
+	 * 
 	 * @param pile
-	 *            the pile to set
+	 *            to draw card from
 	 */
-	public void setPile(CardPile pile) {
-		this.pile = pile;
+	public void draw(CardPile pile) {
+		this.addCard(pile.pop());
+	}
+
+	/**
+	 * Draw a number of cards from the given card pile.
+	 * 
+	 * @param pile
+	 *            to draw card from
+	 * @param number
+	 *            of cards
+	 */
+	public void draw(CardPile pile, int number) {
+		for (int i = 0; i < number; i++) {
+			this.addCard(pile.pop());
+		}
+	}
+
+	/**
+	 * 
+	 * @return the names of all cards in hand
+	 */
+	public Set<String> getCardNames() {
+		TreeSet<String> output = new TreeSet<String>();
+		for (AbstractCard card : hand) {
+			output.add(card.toString());
+		}
+
+		return output;
+
+	}
+
+	/**
+	 * @return the game
+	 */
+	public UNOGame getGame() {
+		return game;
+	}
+
+	/**
+	 * @return the cards in hand
+	 */
+	public TreeSet<AbstractCard> getHand() {
+		return hand;
+	}
+
+	/**
+	 * Find a set of cards in player's hand that can match a given card
+	 * 
+	 * @param card
+	 *            to be matched
+	 * @return the set of cards in player's hand that can match the given card
+	 */
+	public TreeSet<AbstractCard> getMatchesCards(AbstractCard card) {
+		TreeSet<AbstractCard> matchesCards = new TreeSet<AbstractCard>();
+		for (AbstractCard eachCard : hand) {
+			if (eachCard.matches(card)) {
+				matchesCards.add(eachCard);
+			}
+		}
+		return matchesCards;
 	}
 
 	/**
@@ -60,10 +145,41 @@ public class GamePlayer {
 	}
 
 	/**
-	 * @return the game
+	 * 
+	 * @param playerList
+	 *            to be added to
 	 */
-	public UNOGame getGame() {
-		return game;
+	public void joinGame(ArrayList<GamePlayer> playerList) {
+		playerList.add(this);
+	}
+
+	/**
+	 * Play the card given.
+	 * 
+	 * @param card
+	 *            to be played
+	 * @return true if the card is successfully played
+	 */
+	public boolean playCard(Colorable card) {
+		if (game.getCurrentPlayer() == this && hand.contains(card)) {
+			return game.makePlayCard(card);
+		}
+		return false;
+	}
+
+	/**
+	 * Remove a card from player's hand.
+	 * 
+	 * @param card
+	 *            to be removed from player's hand
+	 */
+	public boolean remove(AbstractCard card) {
+		if (hand.contains(card)) {
+			hand.remove(card);
+
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -75,12 +191,10 @@ public class GamePlayer {
 	}
 
 	/**
-	 * 
-	 * @param playerList
-	 *            to be added to
+	 * @param hand
+	 *            the cards in hand to set
 	 */
-	public void addTo(ArrayList<GamePlayer> playerList) {
-		playerList.add(this);
+	public void setHand(TreeSet<AbstractCard> pile) {
+		this.hand = pile;
 	}
-
 }

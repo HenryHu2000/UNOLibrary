@@ -10,6 +10,6 @@ package net.mcplugin.unolib.game.deck;
  *
  */
 public enum ActionType {
-	SKIP, DRAWTWO, REVERSE;
+	SKIP, DRAW_TWO, REVERSE;
 
 }

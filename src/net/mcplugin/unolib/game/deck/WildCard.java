@@ -4,50 +4,68 @@
 package net.mcplugin.unolib.game.deck;
 
 /**
- * Player declares next color to be matched. If draw four is enabled, next
- * player in sequence draws four cards and loses a turn. May be legally played
- * only if the player has no cards of the current color, not counting wild
- * cards; cards in a color different from the current color do not count even if
- * they have the with the same number or symbol.
+ * Player declares next declaredColor to be matched. If draw four is enabled,
+ * next player in sequence draws four cards and loses a turn. May be legally
+ * played only if the player has no cards of the current declaredColor, not
+ * counting wild cards; cards in a declaredColor different from the current
+ * declaredColor do not count even if they have the with the same number or
+ * symbol.
  * 
  * @author Henry Hu
  *
  */
 public class WildCard extends AbstractCard {
-	private final boolean drawfour;
+	private final boolean drawFour;
+	private Color declaredColor = null;
 
 	/**
-	 * @param drawfour
+	 * @param drawFour
 	 *            whether the wild card has the effect to make the next player
 	 *            draw four cards
 	 */
-	public WildCard(boolean drawfour) {
+	public WildCard(boolean drawFour) {
 		super(50);
-		this.drawfour = drawfour;
+		this.drawFour = drawFour;
+	}
+
+	/**
+	 * @return the next declaredColor player declares to be matched
+	 */
+	public Color getDeclaredColor() {
+		return declaredColor;
 	}
 
 	/**
 	 * @return true if the wild card has the effect to make the next player draw
 	 *         four cards
 	 */
-	public boolean isDrawfour() {
-		return drawfour;
+	public boolean isDrawFour() {
+		return drawFour;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean matches(Colorable card) {
+	public boolean matches(AbstractCard card) {
 
 		// Wild cards can match any other cards.
 		return true;
 	}
 
+	/**
+	 * @param declaredColor
+	 *            player declares to be matched
+	 */
+	public void setDeclaredColor(Color color) {
+		this.declaredColor = color;
+	}
+
 	@Override
 	public String toString() {
-		if (!isDrawfour())
+		if (!isDrawFour())
 			return "WILD";
 		else
 			return "WILD DRAWFOUR";
 	}
+
 }

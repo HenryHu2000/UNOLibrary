@@ -24,18 +24,18 @@ public abstract class AbstractCard {
 	}
 
 	/**
+	 * @return the point
+	 */
+	public int getPoint() {
+		return point;
+	}
+
+	/**
 	 * Check if this colored card can be drawn after the given card
 	 * 
 	 * @param card
 	 *            with color to match with
 	 * @return true if this card can be drawn after the given card
 	 */
-	public abstract boolean matches(Colorable card);
-
-	/**
-	 * @return the point
-	 */
-	public int getPoint() {
-		return point;
-	}
+	public abstract boolean matches(AbstractCard card);
 }
