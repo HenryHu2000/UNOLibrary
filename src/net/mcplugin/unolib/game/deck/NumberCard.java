@@ -7,8 +7,7 @@ package net.mcplugin.unolib.game.deck;
  * @author Henry Hu
  *
  */
-public class NumberCard extends AbstractCard implements Colorable {
-	private final Color color;
+public class NumberCard extends ColorCard {
 
 	/**
 	 * @param color
@@ -17,25 +16,17 @@ public class NumberCard extends AbstractCard implements Colorable {
 	 *            of the card
 	 */
 	public NumberCard(Color color, int point) {
-		super(point);
+		super(color, point);
 		// TODO Auto-generated constructor stub
-		this.color = color;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Color getColor() {
-		return color;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean matches(AbstractCard card) {
-		if (card instanceof Colorable) {
-			Colorable coloredCard = (Colorable) card;
-			if (this.color == coloredCard.getColor()) {
+		if (card instanceof ColorCard) {
+			ColorCard coloredCard = (ColorCard) card;
+			if (color == coloredCard.getColor()) {
 				return true;
 			} else if (coloredCard instanceof NumberCard) {
 				NumberCard numCard = (NumberCard) coloredCard;
@@ -44,7 +35,7 @@ public class NumberCard extends AbstractCard implements Colorable {
 			}
 		} else if (card instanceof WildCard) {
 			WildCard wild = (WildCard) card;
-			if (this.color == wild.getDeclaredColor()) {
+			if (color == wild.getDeclaredColor()) {
 				return true;
 			}
 		}

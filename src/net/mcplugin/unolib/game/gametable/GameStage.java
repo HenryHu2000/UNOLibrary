@@ -8,5 +8,5 @@ package net.mcplugin.unolib.game.gametable;
  *
  */
 public enum GameStage {
-	SUSPEND, DREW_SUSPEND, END;
+	SUSPEND, RESTRICTIVE_SUSPEND, END;
 }

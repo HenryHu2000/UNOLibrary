@@ -9,8 +9,7 @@ package net.mcplugin.unolib.game.deck;
  * @author Henry Hu
  *
  */
-public class ActionCard extends AbstractCard implements Colorable {
-	private final Color color;
+public class ActionCard extends ColorCard {
 	private final ActionType action;
 
 	/**
@@ -20,9 +19,8 @@ public class ActionCard extends AbstractCard implements Colorable {
 	 *            of the card
 	 */
 	public ActionCard(Color color, ActionType action) {
-		super(20);
+		super(color, 20);
 		// TODO Auto-generated constructor stub
-		this.color = color;
 		this.action = action;
 	}
 
@@ -36,17 +34,10 @@ public class ActionCard extends AbstractCard implements Colorable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Color getColor() {
-		return color;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean matches(AbstractCard card) {
-		if (card instanceof Colorable) {
-			Colorable coloredCard = (Colorable) card;
-			if (this.color == coloredCard.getColor()) {
+		if (card instanceof ColorCard) {
+			ColorCard coloredCard = (ColorCard) card;
+			if (color == coloredCard.getColor()) {
 				return true;
 			} else if (coloredCard instanceof ActionCard) {
 				ActionCard actionCard = (ActionCard) coloredCard;
@@ -55,7 +46,7 @@ public class ActionCard extends AbstractCard implements Colorable {
 			}
 		} else if (card instanceof WildCard) {
 			WildCard wild = (WildCard) card;
-			if (this.color == wild.getDeclaredColor()) {
+			if (color == wild.getDeclaredColor()) {
 				return true;
 			}
 		}

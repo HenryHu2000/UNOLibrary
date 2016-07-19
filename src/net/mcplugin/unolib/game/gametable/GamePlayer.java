@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.mcplugin.unolib.game.deck.AbstractCard;
-import net.mcplugin.unolib.game.deck.Colorable;
+import net.mcplugin.unolib.game.deck.ColorCard;
 
 /**
  * A class to represent players involved in the card game.
@@ -20,6 +20,7 @@ public class GamePlayer {
 	private final String name;
 	private TreeSet<AbstractCard> hand = new TreeSet<AbstractCard>();
 	private UNOGame game = null;
+	private AbstractCard restrictedCard = null;
 
 	/**
 	 * @param name
@@ -50,8 +51,9 @@ public class GamePlayer {
 	 * @param card
 	 *            to be added to player's hand
 	 */
-	public void addCard(AbstractCard card) {
+	public AbstractCard addCard(AbstractCard card) {
 		hand.add(card);
+		return card;
 	}
 
 	/**
@@ -74,8 +76,8 @@ public class GamePlayer {
 	 * @param pile
 	 *            to draw card from
 	 */
-	public void draw(CardPile pile) {
-		this.addCard(pile.pop());
+	public AbstractCard draw(CardPile pile) {
+		return this.addCard(pile.pop());
 	}
 
 	/**
@@ -145,6 +147,13 @@ public class GamePlayer {
 	}
 
 	/**
+	 * @return the restrictedCard
+	 */
+	public AbstractCard getRestrictedCard() {
+		return restrictedCard;
+	}
+
+	/**
 	 * 
 	 * @param playerList
 	 *            to be added to
@@ -160,11 +169,14 @@ public class GamePlayer {
 	 *            to be played
 	 * @return true if the card is successfully played
 	 */
-	public boolean playCard(Colorable card) {
-		if (game.getCurrentPlayer() == this && hand.contains(card)) {
-			return game.makePlayCard(card);
+	public ProceedResponse playCard(ColorCard card) {
+		if (game.getCurrentPlayer() == this) {
+			if (hand.contains(card)) {
+				return game.proceed(card);
+			}
+			return ProceedResponse.NOT_EXIST;
 		}
-		return false;
+		return ProceedResponse.WRONG_PLAYER;
 	}
 
 	/**
@@ -196,5 +208,13 @@ public class GamePlayer {
 	 */
 	public void setHand(TreeSet<AbstractCard> pile) {
 		this.hand = pile;
+	}
+
+	/**
+	 * @param restrictedCard
+	 *            the restrictedCard to set
+	 */
+	public void setRestrictedCard(AbstractCard drewCard) {
+		this.restrictedCard = drewCard;
 	}
 }
