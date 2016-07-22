@@ -4,11 +4,11 @@
 package net.mcplugin.unolib.game.gametable;
 
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.TreeSet;
 
 import net.mcplugin.unolib.game.deck.AbstractCard;
+import net.mcplugin.unolib.game.deck.Color;
 import net.mcplugin.unolib.game.deck.ColorCard;
+import net.mcplugin.unolib.game.deck.WildCard;
 
 /**
  * A class to represent players involved in the card game.
@@ -18,8 +18,7 @@ import net.mcplugin.unolib.game.deck.ColorCard;
  */
 public class GamePlayer {
 	private final String name;
-	private TreeSet<AbstractCard> hand = new TreeSet<AbstractCard>();
-	private UNOGame game = null;
+	private CardPile hand = new CardPile();
 	private AbstractCard restrictedCard = null;
 
 	/**
@@ -39,21 +38,10 @@ public class GamePlayer {
 	 * @param hand
 	 *            of the player's cards
 	 */
-	public GamePlayer(String name, TreeSet<AbstractCard> pile) {
+	public GamePlayer(String name, CardPile pile) {
 		// TODO Auto-generated constructor stub
 		this.name = name;
 		this.hand = pile;
-	}
-
-	/**
-	 * Add a card to player's hand.
-	 * 
-	 * @param card
-	 *            to be added to player's hand
-	 */
-	public AbstractCard addCard(AbstractCard card) {
-		hand.add(card);
-		return card;
 	}
 
 	/**
@@ -71,13 +59,23 @@ public class GamePlayer {
 	}
 
 	/**
+	 * @param card
+	 * @return
+	 */
+	public void add(AbstractCard card) {
+		hand.add(card);
+	}
+
+	/**
 	 * Draw a card from the given card pile.
 	 * 
 	 * @param pile
 	 *            to draw card from
 	 */
 	public AbstractCard draw(CardPile pile) {
-		return this.addCard(pile.pop());
+		AbstractCard card = pile.pop();
+		this.add(card);
+		return card;
 	}
 
 	/**
@@ -90,7 +88,8 @@ public class GamePlayer {
 	 */
 	public void draw(CardPile pile, int number) {
 		for (int i = 0; i < number; i++) {
-			this.addCard(pile.pop());
+			AbstractCard card = pile.pop();
+			this.add(card);
 		}
 	}
 
@@ -98,27 +97,21 @@ public class GamePlayer {
 	 * 
 	 * @return the names of all cards in hand
 	 */
-	public Set<String> getCardNames() {
-		TreeSet<String> output = new TreeSet<String>();
-		for (AbstractCard card : hand) {
-			output.add(card.toString());
-		}
-
-		return output;
-
+	public String getCardNames() {
+		return hand.toString();
 	}
 
 	/**
-	 * @return the game
+	 * @return number of cards
 	 */
-	public UNOGame getGame() {
-		return game;
+	public int getCardsNumber() {
+		return hand.size();
 	}
 
 	/**
 	 * @return the cards in hand
 	 */
-	public TreeSet<AbstractCard> getHand() {
+	public CardPile getHand() {
 		return hand;
 	}
 
@@ -129,8 +122,8 @@ public class GamePlayer {
 	 *            to be matched
 	 * @return the set of cards in player's hand that can match the given card
 	 */
-	public TreeSet<AbstractCard> getMatchesCards(AbstractCard card) {
-		TreeSet<AbstractCard> matchesCards = new TreeSet<AbstractCard>();
+	public CardPile getMatchesCards(AbstractCard card) {
+		CardPile matchesCards = new CardPile();
 		for (AbstractCard eachCard : hand) {
 			if (eachCard.matches(card)) {
 				matchesCards.add(eachCard);
@@ -158,8 +151,12 @@ public class GamePlayer {
 	 * @param playerList
 	 *            to be added to
 	 */
-	public void joinGame(ArrayList<GamePlayer> playerList) {
-		playerList.add(this);
+	public boolean joinGame(ArrayList<GamePlayer> playerList) {
+		if (!playerList.contains(this)) {
+			playerList.add(this);
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -167,14 +164,37 @@ public class GamePlayer {
 	 * 
 	 * @param card
 	 *            to be played
-	 * @return true if the card is successfully played
+	 * @return
 	 */
-	public ProceedResponse playCard(ColorCard card) {
+	public ProceedResponse playCard(UNOGame game, ColorCard card) {
 		if (game.getCurrentPlayer() == this) {
 			if (hand.contains(card)) {
 				return game.proceed(card);
 			}
 			return ProceedResponse.NOT_EXIST;
+		}
+		return ProceedResponse.WRONG_PLAYER;
+	}
+
+	/**
+	 * @param game
+	 * @param card
+	 * @param declaredColor
+	 * @return
+	 */
+	public ProceedResponse playCard(UNOGame game, WildCard card, Color declaredColor) {
+		if (game.getCurrentPlayer() == this) {
+			if (hand.contains(card)) {
+				return game.proceed(card, declaredColor);
+			}
+			return ProceedResponse.NOT_EXIST;
+		}
+		return ProceedResponse.WRONG_PLAYER;
+	}
+
+	public ProceedResponse playCard(UNOGame game) {
+		if (game.getCurrentPlayer() == this) {
+			return game.proceed();
 		}
 		return ProceedResponse.WRONG_PLAYER;
 	}
@@ -195,18 +215,10 @@ public class GamePlayer {
 	}
 
 	/**
-	 * @param game
-	 *            the game to set
-	 */
-	public void setGame(UNOGame game) {
-		this.game = game;
-	}
-
-	/**
 	 * @param hand
 	 *            the cards in hand to set
 	 */
-	public void setHand(TreeSet<AbstractCard> pile) {
+	public void setHand(CardPile pile) {
 		this.hand = pile;
 	}
 

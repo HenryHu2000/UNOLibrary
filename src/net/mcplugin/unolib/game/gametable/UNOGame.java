@@ -25,7 +25,7 @@ public class UNOGame {
 	private CardPile pile = new CardPile(); // of cards used in game
 	private CardPile discardPile = new CardPile();
 	private AbstractCard currentCard;
-	private int currentPlayerNumber = 0;
+	private int currentPlayerID = 0;
 	private boolean clockwise = true; // of order of play
 
 	/**
@@ -36,9 +36,6 @@ public class UNOGame {
 	 */
 	public UNOGame(ArrayList<GamePlayer> playerList) {
 		// TODO Auto-generated constructor stub
-		for (GamePlayer eachPlayer : playerList) {
-			eachPlayer.setGame(this);
-		}
 		this.playerList = playerList;
 		this.removeRepeatPlayer();
 		pile.initialize(); // Initialize the card pile
@@ -51,10 +48,20 @@ public class UNOGame {
 
 	}
 
-	public void forceProceed(AbstractCard card) {
+	/**
+	 * @param card
+	 *            to be forced to play
+	 * @param gotoNext
+	 *            if need to move to the next player
+	 */
+	public void forceProceed(AbstractCard card, boolean gotoNext) {
+		// Make the given card as the current card, and then remove it from
+		// player's hand to the discard pile.
 		this.setCurrentCard(card);
 		getCurrentPlayer().discard(card, discardPile);
-		gotoNextPlayer();
+		if (gotoNext) {
+			gotoNextPlayer();
+		}
 	}
 
 	/**
@@ -68,14 +75,14 @@ public class UNOGame {
 	 * @return the currentPlayer
 	 */
 	public GamePlayer getCurrentPlayer() {
-		return playerList.get(currentPlayerNumber);
+		return getPlayerList().get(currentPlayerID);
 	}
 
 	/**
-	 * @return the currentPlayerNumber
+	 * @return the currentPlayerID
 	 */
-	public int getCurrentPlayerNumber() {
-		return currentPlayerNumber;
+	public int getCurrentPlayerID() {
+		return currentPlayerID;
 	}
 
 	/**
@@ -86,14 +93,16 @@ public class UNOGame {
 	}
 
 	/**
-	 * @param playerNumber
-	 * @return the number of next player to play card
+	 * @param playerID
+	 * @return the ID of next player to play card
 	 */
-	public int getNextPlayerNumber(int playerNumber) {
+	public int getNextPlayerID(int playerID) {
 		if (isClockwise()) {
-			return (playerNumber >= playerList.size() - 1) ? 0 : (playerNumber + 1);
+			// Return player ID 0 when the given player is the last player.
+			return (playerID >= getPlayerList().size() - 1) ? 0 : (playerID + 1);
 		} else {
-			return (playerNumber <= 0) ? (playerList.size() - 1) : (playerNumber - 1);
+			// Return the last player when the given player is player ID 0.
+			return (playerID <= 0) ? (getPlayerList().size() - 1) : (playerID - 1);
 		}
 
 	}
@@ -106,11 +115,25 @@ public class UNOGame {
 	}
 
 	/**
-	 * @param playerNumber
+	 * @param playerID
 	 * @return
 	 */
-	public GamePlayer getPlayer(int playerNumber) {
-		return playerList.get(playerNumber);
+	public GamePlayer getPlayer(int playerID) {
+		return getPlayerList().get(playerID);
+	}
+
+	/**
+	 * @return the playerList
+	 */
+	public ArrayList<GamePlayer> getPlayerList() {
+		return playerList;
+	}
+
+	/**
+	 * @return number of players
+	 */
+	public int getPlayersNumber() {
+		return playerList.size();
 	}
 
 	/**
@@ -121,7 +144,8 @@ public class UNOGame {
 	}
 
 	public void gotoNextPlayer() {
-		this.setCurrentPlayerNumber(this.getNextPlayerNumber(currentPlayerNumber));
+		// Set the current player ID as the ID of the next player.
+		this.setCurrentPlayerID(this.getNextPlayerID(currentPlayerID));
 	}
 
 	/**
@@ -142,13 +166,17 @@ public class UNOGame {
 		case DRAW_TWO:
 			gotoNextPlayer();
 			this.getCurrentPlayer().draw(pile, 2);
+			gotoNextPlayer();
 
 			break;
 		case REVERSE:
+			// Reverse the direction and then move to the next player.
 			this.setClockwise(!clockwise);
-
+			gotoNextPlayer();
 			break;
 		case SKIP:
+			// Goto the player after the next player.
+			gotoNextPlayer();
 			gotoNextPlayer();
 			break;
 		default:
@@ -157,16 +185,24 @@ public class UNOGame {
 		}
 	}
 
+	/**
+	 * @return response of proceeding
+	 */
 	public ProceedResponse proceed() {
 		switch (stage) {
 		case END:
 			break;
 		case RESTRICTIVE_SUSPEND:
+			// If the player has already drawn a card, the game move to the next
+			// player.
 			this.gotoNextPlayer();
+			// Reset the game stage to SUSPEND.
 			this.stage = GameStage.SUSPEND;
 			return ProceedResponse.SKIPPED;
 		case SUSPEND:
+			// Restrict the card that the player can play to the card he drew.
 			getCurrentPlayer().setRestrictedCard(this.getCurrentPlayer().draw(pile));
+			// Set the game stage to RESTRICTIVE_SUSPEND
 			this.stage = GameStage.RESTRICTIVE_SUSPEND;
 			return ProceedResponse.DREW;
 		default:
@@ -182,10 +218,11 @@ public class UNOGame {
 	 * 
 	 * @param card
 	 *            to play
-	 * @return true if the card is successfully played
+	 * @return response of proceeding
 	 */
 	public ProceedResponse proceed(ColorCard card) {
-		if (card.matches(currentCard)) {
+		if (!card.matches(currentCard)) { // Return if the given card doesn't
+											// match the given card
 			return ProceedResponse.MISMATCHED;
 		}
 		switch (stage) {
@@ -195,10 +232,12 @@ public class UNOGame {
 			if (card == getCurrentPlayer().getRestrictedCard()) {
 
 				if (card instanceof ActionCard) {
+					forceProceed(card, false);
 					this.performAction(((ActionCard) card).getAction());
-				}
-				forceProceed(card);
-				this.stage = GameStage.SUSPEND;
+				} else
+					forceProceed(card, true);
+				this.stage = GameStage.SUSPEND; // Reset the game stage to
+												// SUSPEND.
 				return ProceedResponse.PLAYED;
 			} else
 				return ProceedResponse.BEYOND_RESTRICTION;
@@ -207,9 +246,10 @@ public class UNOGame {
 			if (getCurrentPlayer().getHand().contains(card)) {
 
 				if (card instanceof ActionCard) {
+					forceProceed(card, false);
 					this.performAction(((ActionCard) card).getAction());
-				}
-				forceProceed(card);
+				} else
+					forceProceed(card, true);
 				return ProceedResponse.PLAYED;
 			} else
 				return ProceedResponse.NOT_EXIST;
@@ -226,10 +266,11 @@ public class UNOGame {
 	 * 
 	 * @param card
 	 *            to play
-	 * @return true if the card is successfully played
+	 * @return response of proceeding
 	 */
 	public ProceedResponse proceed(WildCard card, Color declaredColor) {
-		if (card.matches(currentCard)) {
+		if (!card.matches(currentCard)) { // Return if the given card doesn't
+			// match the given card
 			return ProceedResponse.MISMATCHED;
 		}
 		switch (stage) {
@@ -239,7 +280,11 @@ public class UNOGame {
 		case RESTRICTIVE_SUSPEND:
 			if (card == getCurrentPlayer().getRestrictedCard()) {
 				card.declareColor(declaredColor);
-				forceProceed(card);
+				if (card.isDrawFour()) {
+					forceProceed(card, false);
+					getCurrentPlayer().draw(pile, 4);
+				} else
+					forceProceed(card, true);
 				this.stage = GameStage.SUSPEND;
 				return ProceedResponse.PLAYED;
 			}
@@ -248,7 +293,12 @@ public class UNOGame {
 		case SUSPEND:
 			if (getCurrentPlayer().getHand().contains(card)) {
 				card.declareColor(declaredColor);
-				forceProceed(card);
+				if (card.isDrawFour()) {
+					forceProceed(card, false);
+					getCurrentPlayer().draw(pile, 4);
+				} else
+					forceProceed(card, true);
+
 				return ProceedResponse.PLAYED;
 			}
 			return ProceedResponse.NOT_EXIST;
@@ -265,10 +315,12 @@ public class UNOGame {
 	 * Check if there're any repeating players in the list
 	 */
 	public void removeRepeatPlayer() {
-		for (int i = 0; i < playerList.size(); i++) {
-			for (int j = 0; j < playerList.size(); j++) {
-				if (i != j && playerList.get(i) == playerList.get(j)) {
-					playerList.remove(j);
+		for (int i = 0; i < getPlayerList().size(); i++) {
+			for (int j = 0; j < getPlayerList().size(); j++) {
+				if (i != j && getPlayerList().get(i) == getPlayerList().get(j)) {
+					getPlayerList().remove(j); // Remove the player if he
+												// appeared in any other place
+												// of the list
 				}
 			}
 		}
@@ -292,11 +344,11 @@ public class UNOGame {
 	}
 
 	/**
-	 * @param currentPlayerNumber
-	 *            the currentPlayerNumber to set
+	 * @param currentPlayerID
+	 *            the currentPlayerID to set
 	 */
-	public void setCurrentPlayerNumber(int currentPlayerNumber) {
-		this.currentPlayerNumber = currentPlayerNumber;
+	public void setCurrentPlayerID(int currentPlayerID) {
+		this.currentPlayerID = currentPlayerID;
 	}
 
 	/**
@@ -312,23 +364,30 @@ public class UNOGame {
 	 */
 	public void start() {
 		currentCard = pile.pop();
+		discardPile.push(currentCard);
+
 		if (currentCard instanceof WildCard) {
 			if (((WildCard) currentCard).isDrawFour()) {
-				pile.push(currentCard);
-				pile.shuffle();
+				reshuffle();
 				this.start();
 				return;
 			} else {
+				// In order that the player can only use the wild card by
+				// declaring a color
 				getCurrentPlayer().setRestrictedCard(currentCard);
 
 				return;
 			}
 		} else if (currentCard instanceof ActionCard) {
 			this.performAction(((ActionCard) currentCard).getAction());
-			gotoNextPlayer();
 			return;
 		}
-		discardPile.push(currentCard);
+
 	}
 
+	public void reshuffle() {
+		pile.addAll(discardPile);
+		pile.shuffle();
+		discardPile.clear();
+	}
 }

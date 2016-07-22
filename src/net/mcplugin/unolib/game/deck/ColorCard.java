@@ -4,7 +4,7 @@
 package net.mcplugin.unolib.game.deck;
 
 /**
- * Any class which implements this interface has a color
+ * Represents a card with a color.
  * 
  * @author Henry Hu
  *

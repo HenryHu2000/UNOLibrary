@@ -38,4 +38,5 @@ public abstract class AbstractCard {
 	 * @return true if this card can be drawn after the given card
 	 */
 	public abstract boolean matches(AbstractCard card);
+
 }
