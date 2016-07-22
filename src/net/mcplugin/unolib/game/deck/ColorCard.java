@@ -4,7 +4,7 @@
 package net.mcplugin.unolib.game.deck;
 
 /**
- * Represents a card with a color.
+ * Represents a UNO card with a color, includes number cards and action cards.
  * 
  * @author Henry Hu
  *

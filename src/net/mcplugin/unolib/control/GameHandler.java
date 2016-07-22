@@ -11,5 +11,6 @@ import net.mcplugin.unolib.game.deck.AbstractCard;
  */
 public interface GameHandler {
 	public void onStart();
+
 	public AbstractCard onTurn();
 }

@@ -20,6 +20,8 @@ package net.mcplugin.unolib.game.deck;
  */
 public class WildCard extends AbstractCard {
 	private final boolean drawFour;
+	// A wild card does't really have a color, but you need to declare one for
+	// the next player to play card.
 	private Color declaredColor = null;
 
 	/**
@@ -58,6 +60,7 @@ public class WildCard extends AbstractCard {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean matches(AbstractCard card) {
 
 		// Wild cards can match any other cards.
@@ -69,7 +72,7 @@ public class WildCard extends AbstractCard {
 		if (!isDrawFour())
 			return "WILD";
 		else
-			return "WILD DRAWFOUR";
+			return "WILD DRAW_FOUR";
 	}
 
 }

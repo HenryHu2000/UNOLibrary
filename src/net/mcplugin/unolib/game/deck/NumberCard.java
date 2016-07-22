@@ -4,6 +4,9 @@
 package net.mcplugin.unolib.game.deck;
 
 /**
+ * Number cards are simple cards with colors and points, but no further effects
+ * to the game.
+ * 
  * @author Henry Hu
  *
  */
@@ -23,23 +26,30 @@ public class NumberCard extends ColorCard {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean matches(AbstractCard card) {
 		if (card instanceof ColorCard) {
 			ColorCard coloredCard = (ColorCard) card;
 			if (color == coloredCard.getColor()) {
+				// This card can be played after the given colored card, because
+				// they have the same color.
+
 				return true;
 			} else if (coloredCard instanceof NumberCard) {
 				NumberCard numCard = (NumberCard) coloredCard;
+				// This card can be played after the given number card, because
+				// they have the same number.
 				if (this.point == numCard.getPoint())
 					return true;
 			}
 		} else if (card instanceof WildCard) {
 			WildCard wild = (WildCard) card;
 			if (color == wild.getDeclaredColor()) {
+				// This card can be played after the given wild card, because
+				// they have the same color.
 				return true;
 			}
 		}
-		// more codes needed
 		return false;
 	}
 

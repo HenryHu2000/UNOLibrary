@@ -19,6 +19,11 @@ import net.mcplugin.unolib.game.deck.WildCard;
 public class GamePlayer {
 	private final String name;
 	private CardPile hand = new CardPile();
+	// If in a player's turn, he choose to draw a card instead of playing a
+	// card, he must
+	// play the drawn card if it matches the previous card, but not other cards.
+	// The restricted card is the only card the player can play, in the
+	// restrictive suspend stage.
 	private AbstractCard restrictedCard = null;
 
 	/**
@@ -31,7 +36,7 @@ public class GamePlayer {
 	}
 
 	/**
-	 * Create a player with a given set of cards in hand
+	 * Create a player with a given set of initial cards in hand.
 	 * 
 	 * @param name
 	 *            of the player
@@ -45,6 +50,17 @@ public class GamePlayer {
 	}
 
 	/**
+	 * Add a card to player's hand.
+	 * 
+	 * @param card
+	 * @return
+	 */
+	public void add(AbstractCard card) {
+		hand.add(card);
+	}
+
+	/**
+	 * Discard a card from the player's hand to the give discard pile.
 	 * 
 	 * @param card
 	 *            to discard
@@ -56,14 +72,6 @@ public class GamePlayer {
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * @param card
-	 * @return
-	 */
-	public void add(AbstractCard card) {
-		hand.add(card);
 	}
 
 	/**
@@ -116,7 +124,7 @@ public class GamePlayer {
 	}
 
 	/**
-	 * Find a set of cards in player's hand that can match a given card
+	 * Find a set of cards in player's hand that can match a given card.
 	 * 
 	 * @param card
 	 *            to be matched
@@ -133,20 +141,22 @@ public class GamePlayer {
 	}
 
 	/**
-	 * @return the name
+	 * @return the name of player
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @return the restrictedCard
+	 * @return the restricted card
 	 */
 	public AbstractCard getRestrictedCard() {
 		return restrictedCard;
 	}
 
 	/**
+	 * Let the player join in a player list. You can then add the player list to
+	 * a game.
 	 * 
 	 * @param playerList
 	 *            to be added to
@@ -159,44 +169,52 @@ public class GamePlayer {
 		return false;
 	}
 
-	/**
-	 * Play the card given.
-	 * 
-	 * @param card
-	 *            to be played
-	 * @return
-	 */
-	public ProceedResponse playCard(UNOGame game, ColorCard card) {
-		if (game.getCurrentPlayer() == this) {
-			if (hand.contains(card)) {
-				return game.proceed(card);
-			}
-			return ProceedResponse.NOT_EXIST;
-		}
-		return ProceedResponse.WRONG_PLAYER;
-	}
-
-	/**
-	 * @param game
-	 * @param card
-	 * @param declaredColor
-	 * @return
-	 */
-	public ProceedResponse playCard(UNOGame game, WildCard card, Color declaredColor) {
-		if (game.getCurrentPlayer() == this) {
-			if (hand.contains(card)) {
-				return game.proceed(card, declaredColor);
-			}
-			return ProceedResponse.NOT_EXIST;
-		}
-		return ProceedResponse.WRONG_PLAYER;
-	}
-
 	public ProceedResponse playCard(UNOGame game) {
 		if (game.getCurrentPlayer() == this) {
 			return game.proceed();
 		}
 		return ProceedResponse.WRONG_PLAYER;
+	}
+
+	/**
+	 * Let the player play a number card or an action card in a specific game.
+	 * 
+	 * @param game
+	 *            to play the card
+	 * @param card
+	 *            to be played
+	 * @return the response of playing the card
+	 */
+	public ProceedResponse playCard(UNOGame game, ColorCard card) {
+		if (game.getCurrentPlayer() != this) {
+			return ProceedResponse.WRONG_PLAYER;
+		}
+		if (!hand.contains(card)) {
+			return ProceedResponse.NOT_EXIST;
+		}
+
+		return game.proceed(card);
+	}
+
+	/**
+	 * Let the player play a wild card in a specific game.
+	 * 
+	 * @param game
+	 *            to play the card
+	 * @param card
+	 *            to be played
+	 * @param declaredColor
+	 *            of the played wild card
+	 * @return the response of playing the card
+	 */
+	public ProceedResponse playCard(UNOGame game, WildCard card, Color declaredColor) {
+		if (game.getCurrentPlayer() != this) {
+			return ProceedResponse.WRONG_PLAYER;
+		}
+		if (!hand.contains(card)) {
+			return ProceedResponse.NOT_EXIST;
+		}
+		return game.proceed(card, declaredColor);
 	}
 
 	/**
@@ -211,7 +229,8 @@ public class GamePlayer {
 
 			return true;
 		}
-		return false;
+		return false; // Failed to remove the card because the player doesn't
+						// actually have the card.
 	}
 
 	/**
@@ -223,6 +242,11 @@ public class GamePlayer {
 	}
 
 	/**
+	 * If in a player's turn, he choose to draw a card instead of playing a
+	 * card, he must play the drawn card if it matches the previous card, but
+	 * not other cards. The restricted card is the only card the player can
+	 * play, in the restrictive suspend stage.
+	 * 
 	 * @param restrictedCard
 	 *            the restrictedCard to set
 	 */

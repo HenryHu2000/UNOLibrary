@@ -4,7 +4,7 @@
 package net.mcplugin.unolib.game.deck;
 
 /**
- * a type of cards that can invoke an action
+ * Action card is a type of cards that can invoke an action.
  * 
  * @author Henry Hu
  *
@@ -34,6 +34,7 @@ public class ActionCard extends ColorCard {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean matches(AbstractCard card) {
 		if (card instanceof ColorCard) {
 			ColorCard coloredCard = (ColorCard) card;

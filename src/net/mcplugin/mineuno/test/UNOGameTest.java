@@ -20,10 +20,6 @@ import net.mcplugin.unolib.game.gametable.GamePlayer;
 import net.mcplugin.unolib.game.gametable.UNOGame;
 
 public class UNOGameTest {
-	private UNOGame game;
-	private int playersNumber;
-	private int totalCardsNumber;
-
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -31,6 +27,12 @@ public class UNOGameTest {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 	}
+
+	private UNOGame game;
+
+	private int playersNumber;
+
+	private int totalCardsNumber;
 
 	@Before
 	public void setUp() throws Exception {
@@ -49,41 +51,6 @@ public class UNOGameTest {
 
 	@After
 	public void tearDown() throws Exception {
-	}
-
-	@Test
-	public void testUNOGame() {
-		System.out.println("Cards in players' hand:");
-		int differentCardsNum = 0;
-		for (GamePlayer player : game.getPlayerList()) {
-			System.out.println(player.getCardNames());
-			assertEquals("Correct number of players", playersNumber, game.getPlayersNumber());
-			if (player.getCardsNumber() == 8 || player.getCardsNumber() == 9) {
-				differentCardsNum++;
-			}
-			assertEquals("Correct initial card number", 7,
-					(player.getCardsNumber() == 8 || player.getCardsNumber() == 9) ? 7 : player.getCardsNumber());
-
-		}
-		if (differentCardsNum > 1) {
-			fail("too many players with abnormal number of cards");
-		}
-
-		System.out.println(game.getCurrentCard());
-
-		totalCardsNumber = game.getPile().size() + game.getDiscardPile().size();
-		for (GamePlayer player : game.getPlayerList()) {
-			totalCardsNumber += player.getCardsNumber();
-		}
-		assertEquals("Currect total card number in game", 108, totalCardsNumber);
-		if (game.getCurrentCard() instanceof WildCard) {
-			game.proceed((WildCard) game.getCurrentCard(), Color.GREEN);
-			for (GamePlayer player : game.getPlayerList()) {
-				totalCardsNumber += player.getCardsNumber();
-			}
-			assertEquals("Currect total card number in game after proceed", 108, totalCardsNumber);
-
-		}
 	}
 
 	@Test
@@ -186,6 +153,41 @@ public class UNOGameTest {
 	@Test
 	public void testStart() {
 		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testUNOGame() {
+		System.out.println("Cards in players' hand:");
+		int differentCardsNum = 0;
+		for (GamePlayer player : game.getPlayerList()) {
+			System.out.println(player.getCardNames());
+			assertEquals("Correct number of players", playersNumber, game.getPlayersNumber());
+			if (player.getCardsNumber() == 8 || player.getCardsNumber() == 9) {
+				differentCardsNum++;
+			}
+			assertEquals("Correct initial card number", 7,
+					(player.getCardsNumber() == 8 || player.getCardsNumber() == 9) ? 7 : player.getCardsNumber());
+
+		}
+		if (differentCardsNum > 1) {
+			fail("too many players with abnormal number of cards");
+		}
+
+		System.out.println(game.getCurrentCard());
+
+		totalCardsNumber = game.getPile().size() + game.getDiscardPile().size();
+		for (GamePlayer player : game.getPlayerList()) {
+			totalCardsNumber += player.getCardsNumber();
+		}
+		assertEquals("Currect total card number in game", 108, totalCardsNumber);
+		if (game.getCurrentCard() instanceof WildCard) {
+			game.proceed((WildCard) game.getCurrentCard(), Color.GREEN);
+			for (GamePlayer player : game.getPlayerList()) {
+				totalCardsNumber += player.getCardsNumber();
+			}
+			assertEquals("Currect total card number in game after proceed", 108, totalCardsNumber);
+
+		}
 	}
 
 }

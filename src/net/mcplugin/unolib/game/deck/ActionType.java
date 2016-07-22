@@ -10,6 +10,17 @@ package net.mcplugin.unolib.game.deck;
  *
  */
 public enum ActionType {
-	SKIP, DRAW_TWO, REVERSE;
+
+	/**
+	 * Skip the next player.
+	 */
+	SKIP, /**
+			 * Let the next player draw two cards, and then skip him.
+			 */
+	DRAW_TWO, /**
+				 * Reverse the direction of playing card before moving to the
+				 * next player.
+				 */
+	REVERSE;
 
 }

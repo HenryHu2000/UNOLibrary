@@ -4,7 +4,7 @@
 package net.mcplugin.unolib.game.deck;
 
 /**
- * Four colors for number cards and action cards
+ * Four colors for number cards and action cards.
  * 
  * @author Henry Hu
  *
