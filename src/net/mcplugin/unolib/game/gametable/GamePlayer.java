@@ -253,4 +253,9 @@ public class GamePlayer {
 	public void setRestrictedCard(AbstractCard drewCard) {
 		this.restrictedCard = drewCard;
 	}
+
+	@Override
+	public String toString() {
+		return this.getName();
+	}
 }

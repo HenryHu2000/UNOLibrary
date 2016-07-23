@@ -116,6 +116,19 @@ public class UNOGame {
 	}
 
 	/**
+	 * @param player
+	 *            to find
+	 * @return the ID of the player, return -1 if player is not found.
+	 */
+	public int getPlayerID(GamePlayer player) {
+		for (int i = 0; i < playerList.size(); i++) {
+			if (playerList.get(i) == player)
+				return i;
+		}
+		return -1;
+	}
+
+	/**
 	 * @return the discardPile
 	 */
 	public CardPile getDiscardPile() {
@@ -273,7 +286,7 @@ public class UNOGame {
 				forceProceed(card, true);
 			this.stage = GameStage.SUSPEND; // Reset the game stage to
 											// SUSPEND.
-			return ProceedResponse.PLAYED;
+			return ProceedResponse.PLAYED_DRAWN;
 
 		case SUSPEND:
 			if (!getCurrentPlayer().getHand().contains(card)) {
@@ -340,7 +353,7 @@ public class UNOGame {
 				forceProceed(card, true);
 			this.stage = GameStage.SUSPEND; // Recover the game stage to
 											// suspend.
-			return ProceedResponse.PLAYED;
+			return ProceedResponse.PLAYED_DRAWN;
 
 		case SUSPEND:
 			if (!getCurrentPlayer().getHand().contains(card)) {

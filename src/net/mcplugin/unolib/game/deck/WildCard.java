@@ -50,6 +50,13 @@ public class WildCard extends AbstractCard {
 	}
 
 	/**
+	 * @return
+	 */
+	public boolean isDeclared() {
+		return (this.getDeclaredColor() != null);
+	}
+
+	/**
 	 * @return true if the wild card has the effect to make the next player draw
 	 *         four cards
 	 */
