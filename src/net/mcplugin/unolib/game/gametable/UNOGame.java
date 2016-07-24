@@ -44,7 +44,7 @@ public class UNOGame {
 				this.getPlayer(playerNum).draw(pile);
 			}
 		}
-		this.start();
+		this.discardFirst();
 
 	}
 
@@ -450,7 +450,7 @@ public class UNOGame {
 	/**
 	 * Start the game by discarding the top card on the pile.
 	 */
-	public void start() {
+	public void discardFirst() {
 		// Discard a card on the top of the pile.
 		currentCard = pile.pop();
 		getDiscardPile().push(currentCard);
@@ -459,8 +459,9 @@ public class UNOGame {
 			if (((WildCard) currentCard).isDrawFour()) {
 				reshuffle(); // Shuffle the pile because the card on top is a
 								// wild draw four.
-				this.start(); // Do the action of discarding the card on top
-								// again.
+				this.discardFirst(); // Do the action of discarding the card on
+										// top
+				// again.
 				return;
 			} else {
 				// In order that the player can only use the wild card by
