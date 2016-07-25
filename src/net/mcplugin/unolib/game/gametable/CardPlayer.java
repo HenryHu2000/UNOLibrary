@@ -16,7 +16,7 @@ import net.mcplugin.unolib.game.deck.WildCard;
  * @author Henry Hu
  *
  */
-public class GamePlayer {
+public class CardPlayer {
 	private final String name;
 	private CardPile hand = new CardPile();
 	// If in a player's turn, he choose to draw a card instead of playing a
@@ -30,7 +30,7 @@ public class GamePlayer {
 	 * @param name
 	 *            of the player
 	 */
-	public GamePlayer(String name) {
+	public CardPlayer(String name) {
 		// TODO Auto-generated constructor stub
 		this.name = name;
 	}
@@ -43,7 +43,7 @@ public class GamePlayer {
 	 * @param hand
 	 *            of the player's cards
 	 */
-	public GamePlayer(String name, CardPile pile) {
+	public CardPlayer(String name, CardPile pile) {
 		// TODO Auto-generated constructor stub
 		this.name = name;
 		this.hand = pile;
@@ -94,11 +94,14 @@ public class GamePlayer {
 	 * @param number
 	 *            of cards
 	 */
-	public void draw(CardPile pile, int number) {
+	public CardPile draw(CardPile pile, int number) {
+		CardPile drawnCards = new CardPile();
 		for (int i = 0; i < number; i++) {
 			AbstractCard card = pile.pop();
 			this.add(card);
+			drawnCards.add(card);
 		}
+		return drawnCards;
 	}
 
 	/**
@@ -155,13 +158,21 @@ public class GamePlayer {
 	}
 
 	/**
+	 * @param card
+	 * @return true if the player has the given card
+	 */
+	public boolean has(AbstractCard card) {
+		return getHand().contains(card);
+	}
+
+	/**
 	 * Let the player join in a player list. You can then add the player list to
 	 * a game.
 	 * 
 	 * @param playerList
 	 *            to be added to
 	 */
-	public boolean joinGame(ArrayList<GamePlayer> playerList) {
+	public boolean joinGame(ArrayList<CardPlayer> playerList) {
 		if (!playerList.contains(this)) {
 			playerList.add(this);
 			return true;
