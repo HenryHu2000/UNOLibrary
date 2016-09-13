@@ -4,7 +4,7 @@
 package net.mcplugin.unolib.control;
 
 import net.mcplugin.unolib.game.deck.AbstractCard;
-import net.mcplugin.unolib.game.deck.ActionCard;
+import net.mcplugin.unolib.game.deck.ActionType;
 import net.mcplugin.unolib.game.gametable.CardPlayer;
 import net.mcplugin.unolib.game.gametable.UNOGame;
 
@@ -13,15 +13,13 @@ import net.mcplugin.unolib.game.gametable.UNOGame;
  *
  */
 public interface GameHandler {
-	public void onAction(ActionCard card, CardPlayer invoker);
-
-	public void onCardChange(CardPlayer player, int change, int totalCards);
+	public void onAction(ActionType action, CardPlayer invoker);
 
 	public void onCardNotExist(CardPlayer player, AbstractCard currentCard);
 
-	public void onChooseColor(CardPlayer player);
+	public void onCardsChange(CardPlayer player, int change, int totalCards);
 
-	public void onDraw(CardPlayer player, int cardsNumber);
+	public void onChooseColor(CardPlayer player);
 
 	public void onDrawInTurn(CardPlayer player, AbstractCard cardDrawn);
 
@@ -36,7 +34,7 @@ public interface GameHandler {
 	 * @param afterDrawn
 	 *            tells if the event of playing a card is after he drew a card
 	 */
-	public void onPlay(CardPlayer player, boolean afterDrawn, AbstractCard playedCard);
+	public void onPlay(CardPlayer player, AbstractCard playedCard, boolean afterDrawn);
 
 	public void onSkipAfterDrawn(CardPlayer player, AbstractCard currentCard);
 
@@ -58,6 +56,5 @@ public interface GameHandler {
 	 */
 	public void onTurn(CardPlayer player, AbstractCard currentCard);
 
-	public void onUndeclaredColor(CardPlayer player, AbstractCard currentCard);
 
 }

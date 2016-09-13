@@ -42,7 +42,7 @@ public class UNOGameTest {
 			playerList.add(new CardPlayer(Integer.toString(i)));
 		}
 
-		game = new UNOGame(playerList);
+		game = new UNOGame(null, playerList);
 		totalCardsNumber = game.getPile().size() + game.getDiscardPile().size();
 		for (CardPlayer player : game.getPlayerList()) {
 			totalCardsNumber += player.getCardsNumber();
@@ -142,7 +142,7 @@ public class UNOGameTest {
 			playerList.add(firstPlayer);
 			playerList.add(secondPlayer);
 		}
-		game = new UNOGame(playerList);
+		game = new UNOGame(null, playerList);
 		game.removeRepeatPlayer();
 		assertEquals("Correct first player", firstPlayer, game.getPlayerList().get(0));
 		assertEquals("Correct second player", secondPlayer, game.getPlayerList().get(1));

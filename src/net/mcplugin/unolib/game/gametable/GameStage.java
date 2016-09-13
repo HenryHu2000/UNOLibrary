@@ -21,8 +21,12 @@ public enum GameStage {
 				 * stage.
 				 */
 	RESTRICTIVE_SUSPEND, /**
-							 * If anyone of the players has no cards, the game
-							 * moves to the end, and it can't proceed anymore.
+							 * The current player need to choose a color for the
+							 * current wild card or wild draw four card.
 							 */
+	DECLARE_COLOR, /**
+					 * If anyone of the players has no cards, the game moves to
+					 * the end, and it can't proceed anymore.
+					 */
 	END;
 }

@@ -28,7 +28,7 @@ public class UNOController {
 	 * 
 	 */
 	public UNOController(ControllerHandler controllerHandler, ArrayList<CardPlayer> playerList) {
-		game = new UNOGame(playerList);
+		game = new UNOGame(null, playerList);
 		this.controllerHandler = controllerHandler;
 		this.controllerHandler.onStart(game, game.getCurrentPlayer(), game.getCurrentCard());
 		if (game.getCurrentCard() instanceof WildCard) {
@@ -103,11 +103,6 @@ public class UNOController {
 			controllerHandler.onCardChange(player, -1, player.getCardsNumber());
 			cardChosen = null;
 			return true;
-		case PLAYED_DRAWN:
-			controllerHandler.onPlay(player, true, game.getCurrentCard());
-			controllerHandler.onCardChange(player, -1, player.getCardsNumber());
-			cardChosen = null;
-			return true;
 		case SKIPPED:
 			controllerHandler.onSkipAfterDrawn(player, game.getCurrentCard());
 
@@ -145,7 +140,7 @@ public class UNOController {
 		CardPlayer player = game.getCurrentPlayer();
 		if (cardChosen instanceof ColorCard) {
 			ProceedResponse response = game.proceed((ColorCard) cardChosen);
-			if (response == ProceedResponse.PLAYED || response == ProceedResponse.PLAYED_DRAWN) {
+			if (response == ProceedResponse.PLAYED) {
 				if (cardChosen instanceof ActionCard) {
 					controllerHandler.onAction(((ActionCard) cardChosen), player);
 					if (((ActionCard) cardChosen).getAction() == ActionType.DRAW_TWO) {
@@ -158,7 +153,7 @@ public class UNOController {
 		} else if (cardChosen instanceof WildCard) {
 
 			ProceedResponse response = game.proceed((WildCard) cardChosen, controllerHandler.onChooseColor(player));
-			if (response == ProceedResponse.PLAYED || response == ProceedResponse.PLAYED_DRAWN) {
+			if (response == ProceedResponse.PLAYED) {
 				if (((WildCard) cardChosen).isDrawFour()) {
 					controllerHandler.onCardChange(game.getCurrentPlayer(), 4,
 							game.getCurrentPlayer().getCardsNumber());

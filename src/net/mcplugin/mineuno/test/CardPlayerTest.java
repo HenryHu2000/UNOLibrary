@@ -136,7 +136,7 @@ public class CardPlayerTest {
 		if (successful)
 			assertEquals("Player number", playerNumBefore + 1, playerNumAfter);
 		playerList.add(new CardPlayer("1"));
-		UNOGame game = new UNOGame(playerList);
+		UNOGame game = new UNOGame(null, playerList);
 		assertTrue("Player in the game", game.getPlayerList().contains(player));
 	}
 

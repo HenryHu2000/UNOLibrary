@@ -5,11 +5,11 @@ package net.mcplugin.unolib.game.gametable;
 
 import java.util.ArrayList;
 
+import net.mcplugin.unolib.control.GameHandler;
 import net.mcplugin.unolib.game.deck.AbstractCard;
 import net.mcplugin.unolib.game.deck.ActionCard;
 import net.mcplugin.unolib.game.deck.ActionType;
 import net.mcplugin.unolib.game.deck.Color;
-import net.mcplugin.unolib.game.deck.ColorCard;
 import net.mcplugin.unolib.game.deck.WildCard;
 
 /**
@@ -27,27 +27,28 @@ public class UNOGame {
 	private AbstractCard currentCard;
 	private int currentPlayerID = 0;
 	private boolean clockwise = true; // of order of play
+	private GameHandler handler;
 
 	/**
 	 * Create an UNO game with a given list of players
 	 * 
+	 * @param handler
+	 *            of the game
 	 * @param playerList
 	 *            involves all players who join the card game
 	 */
-	public UNOGame(ArrayList<CardPlayer> playerList) {
+	public UNOGame(GameHandler handler, ArrayList<CardPlayer> playerList) {
 		// TODO Auto-generated constructor stub
+		this.handler = handler;
 		this.playerList = playerList;
 		if (playerList.size() <= 1) {
 			throw new IllegalArgumentException("Too few players");
 		}
 		this.removeRepeatPlayer();
 		pile.initialize(); // Initialize the card pile
-		for (int i = 0; i < 7; i++) { // Deal the cards to each players
-			for (int playerNum = 0; playerNum < playerList.size(); playerNum++) {
-				this.getPlayer(playerNum).draw(pile);
-			}
-		}
+		this.deal();
 		this.discardFirst();
+		handler.onStart(this, getCurrentPlayer(), getCurrentCard());
 
 	}
 
@@ -56,6 +57,8 @@ public class UNOGame {
 	 * automatically start the game. (Please set the card pile and the discard
 	 * pile by yourself.)
 	 * 
+	 * @param handler
+	 *            of the game
 	 * @param playerList
 	 *            involves all players who join the card game
 	 * @param currentPlayerID
@@ -65,12 +68,28 @@ public class UNOGame {
 	 * @param clockwise
 	 *            of the direction of the game
 	 */
-	public UNOGame(ArrayList<CardPlayer> playerList, int currentPlayerID, AbstractCard currentCard, boolean clockwise) {
+	public UNOGame(GameHandler handler, ArrayList<CardPlayer> playerList, int currentPlayerID, AbstractCard currentCard,
+			boolean clockwise) {
+		this.handler = handler;
 		this.playerList = playerList;
 		this.removeRepeatPlayer();
 		this.currentPlayerID = currentPlayerID;
 		this.currentCard = currentCard;
 		this.clockwise = clockwise;
+	}
+
+	/**
+	 * Deal seven cards to each player.
+	 */
+	public void deal() {
+		for (int i = 0; i < 7; i++) { // Deal the cards to each players
+			for (int playerNum = 0; playerNum < playerList.size(); playerNum++) {
+				this.getPlayer(playerNum).draw(pile);
+
+				handler.onCardsChange(getCurrentPlayer(), 1, getCurrentPlayer().getCardsNumber());
+			}
+		}
+
 	}
 
 	/**
@@ -96,16 +115,24 @@ public class UNOGame {
 				// restrictive suspend stage,
 				// although he doesn't really have it.
 				getCurrentPlayer().setRestrictedCard(currentCard);
-				stage = GameStage.RESTRICTIVE_SUSPEND;
+				stage = GameStage.DECLARE_COLOR;
 				return;
 			}
 		} else if (currentCard instanceof ActionCard) {
 			this.performAction(((ActionCard) currentCard).getAction());
 			stage = GameStage.SUSPEND;
+
+			handler.onTurn(getCurrentPlayer(), getCurrentCard());
+
 			return;
-		} else
+		} else {
 			gotoNextPlayer(); // Simply goto the next player if the card is a
-								// normal number card.
+			// normal number card.
+
+			handler.onTurn(getCurrentPlayer(), getCurrentCard());
+
+			return;
+		}
 
 	}
 
@@ -123,6 +150,8 @@ public class UNOGame {
 		// player's hand to the discard pile.
 		this.setCurrentCard(card);
 		getCurrentPlayer().discard(card, getDiscardPile());
+
+		handler.onCardsChange(getCurrentPlayer(), -1, getCurrentPlayer().getCardsNumber());
 		if (getCurrentPlayer().getHand().isEmpty()) {
 			stage = GameStage.END; // End the game if anyone of the players has
 									// no card
@@ -130,6 +159,9 @@ public class UNOGame {
 		}
 		if (gotoNext) {
 			gotoNextPlayer();
+
+			handler.onTurn(getCurrentPlayer(), getCurrentCard());
+
 		}
 	}
 
@@ -225,6 +257,20 @@ public class UNOGame {
 		return stage;
 	}
 
+	/**
+	 * @return
+	 */
+	public CardPlayer getWinner() {
+		CardPlayer winner = null;
+		for (CardPlayer eachPlayer : getPlayerList()) {
+			if (eachPlayer.getCardsNumber() == 0) {
+				winner = eachPlayer;
+				break;
+			}
+		}
+		return winner;
+	}
+
 	public void gotoNextPlayer() {
 		// Set the current player ID as the ID of the next player.
 		this.setCurrentPlayerID(this.getNextPlayerID(currentPlayerID));
@@ -244,10 +290,13 @@ public class UNOGame {
 	 *            to perform
 	 */
 	public void performAction(ActionType action) {
+		CardPlayer invoker = getCurrentPlayer();
 		switch (action) {
 		case DRAW_TWO:
 			gotoNextPlayer();
 			this.getCurrentPlayer().draw(pile, 2);
+
+			handler.onCardsChange(getCurrentPlayer(), 2, getCurrentPlayer().getCardsNumber());
 			gotoNextPlayer();
 
 			break;
@@ -265,6 +314,8 @@ public class UNOGame {
 			break;
 
 		}
+
+		handler.onAction(action, invoker);
 	}
 
 	/**
@@ -273,6 +324,7 @@ public class UNOGame {
 	public ProceedResponse proceed() {
 		switch (stage) {
 		case END:
+			handler.onEnd(getWinner());
 			return ProceedResponse.ENDED;
 		case RESTRICTIVE_SUSPEND:
 			// If the player has already drawn a card, the game move to the next
@@ -280,13 +332,20 @@ public class UNOGame {
 			this.gotoNextPlayer();
 			// Reset the game stage to SUSPEND.
 			this.stage = GameStage.SUSPEND;
+
+			handler.onTurn(getCurrentPlayer(), getCurrentCard());
+
 			return ProceedResponse.SKIPPED;
 		case SUSPEND:
 			// Restrict the card that the player can play to the card he drew.
 			getCurrentPlayer().setRestrictedCard(this.getCurrentPlayer().draw(pile));
-			// Set the game stage to RESTRICTIVE_SUSPEND
+
+			handler.onCardsChange(getCurrentPlayer(), 1, getCurrentPlayer().getCardsNumber());
+			// Restrict the card to the drawn card
 			this.stage = GameStage.RESTRICTIVE_SUSPEND;
 			return ProceedResponse.DREW;
+		case DECLARE_COLOR:
+			return ProceedResponse.COLOR_UNSPECIFIED;
 		default:
 			break;
 
@@ -302,13 +361,18 @@ public class UNOGame {
 	 *            to play
 	 * @return response of proceeding
 	 */
-	public ProceedResponse proceed(ColorCard card) {
+	public ProceedResponse proceed(AbstractCard card) {
+		if (card == null) {
+			return this.proceed();
+		}
 		if (!card.matches(currentCard)) { // Return if the given card doesn't
 											// match the given card
 			return ProceedResponse.MISMATCHED;
 		}
+		CardPlayer player = getCurrentPlayer();
 		switch (stage) {
 		case END:
+			handler.onEnd(getWinner());
 			return ProceedResponse.ENDED;
 		case RESTRICTIVE_SUSPEND:
 			if (card != getCurrentPlayer().getRestrictedCard()) {
@@ -317,34 +381,18 @@ public class UNOGame {
 				// player can only play the same card after he drew one.
 				return ProceedResponse.BEYOND_RESTRICTION;
 			}
-
-			if (card instanceof ActionCard) {
-				forceProceed(card, false);
-				this.performAction(((ActionCard) card).getAction());
-			} else
-				forceProceed(card, true);
-			this.stage = GameStage.SUSPEND; // Reset the game stage to
-											// SUSPEND.
-			return ProceedResponse.PLAYED_DRAWN;
+			handler.onPlay(player, card, true);
+			return useCard(player, card);
 
 		case SUSPEND:
 			if (!getCurrentPlayer().getHand().contains(card)) {
 				// Returns because the player doesn't have the card in hand.
 				return ProceedResponse.NOT_EXIST;
 			}
-
-			if (card instanceof ActionCard) { // Perform an action if the card
-												// is an action card.
-				// Remove the action card from the player without automatically
-				// moving to the next player, since action cards have their own
-				// rules.
-				forceProceed(card, false);
-				this.performAction(((ActionCard) card).getAction());
-			} else
-				forceProceed(card, true); // For the normal number cards,
-											// automatically proceed to the next
-											// player.
-			return ProceedResponse.PLAYED;
+			handler.onPlay(player, card, false);
+			return useCard(player, card);
+		case DECLARE_COLOR:
+			return ProceedResponse.COLOR_UNSPECIFIED;
 
 		default:
 			break;
@@ -354,68 +402,41 @@ public class UNOGame {
 	}
 
 	/**
-	 * Make the current player play a given card if he has it
-	 * 
-	 * @param card
-	 *            to play
-	 * @param declaredColor
-	 *            the player declares for the wild card
-	 * @return response of proceeding
+	 * @param color
+	 *            to declare
+	 * @return response
 	 */
-	public ProceedResponse proceed(WildCard card, Color declaredColor) {
-		if (!card.matches(currentCard)) { // Return if the given card doesn't
-			// match the given card
-			return ProceedResponse.MISMATCHED;
-		}
-		switch (stage) {
-		case END:
-			return ProceedResponse.ENDED;
+	public ProceedResponse proceed(Color color) {
+		// TODO Add codes for this method
+		if (getCurrentCard() instanceof WildCard && stage == GameStage.DECLARE_COLOR) {
+			WildCard wild = (WildCard) getCurrentCard();
+			if (!wild.isDeclared()) {
 
-		case RESTRICTIVE_SUSPEND:
-			if (card != getCurrentPlayer().getRestrictedCard()) {
-				// Returns if the card is not the card drawn in this turn.
-				// Remember a
-				// player can only play the same card after he drew one.
-				return ProceedResponse.BEYOND_RESTRICTION;
+				wild.declareColor(color);
+				if (wild.isDrawFour()) {
+					// Next player must draw four cards because of the wild draw
+					// four.
+					forceProceed(wild, false);
+					getCurrentPlayer().draw(pile, 4);
+
+					handler.onCardsChange(getCurrentPlayer(), 4, getCurrentPlayer().getCardsNumber());
+				} else
+					forceProceed(wild, true);
+				handler.onTurn(getCurrentPlayer(), getCurrentCard());
 			}
-			card.declareColor(declaredColor); // Every time a player plays a
-												// wild card, he must declare a
-												// color.
-			if (card.isDrawFour()) {
-				forceProceed(card, true);
-				// Next player must draw four cards because of the wild draw
-				// four.
-				getCurrentPlayer().draw(pile, 4);
-				gotoNextPlayer();
-
-			} else
-				forceProceed(card, true);
-			this.stage = GameStage.SUSPEND; // Recover the game stage to
-											// suspend.
-			return ProceedResponse.PLAYED_DRAWN;
-
-		case SUSPEND:
-			if (!getCurrentPlayer().getHand().contains(card)) {
-				// Returns because the player doesn't have the card in hand.
-				return ProceedResponse.NOT_EXIST;
-			}
-			// Every time a player plays a wild card, he must declare a color.
-			card.declareColor(declaredColor);
-			if (card.isDrawFour()) {
-				// Next player must draw four cards because of the wild draw
-				// four.
-				forceProceed(card, false);
-				getCurrentPlayer().draw(pile, 4);
-			} else
-				forceProceed(card, true);
-
+			stage = GameStage.SUSPEND;
 			return ProceedResponse.PLAYED;
-
-		default:
-			break;
-
 		}
-		return ProceedResponse.UNKNOWN;
+		return ProceedResponse.NOT_EXIST;
+	}
+
+	/**
+	 * @deprecated As the response of the method is unsafe.
+	 */
+	@Deprecated
+	public ProceedResponse proceed(WildCard card, Color declaredColor) {
+		proceed(card);
+		return proceed(declaredColor);
 
 	}
 
@@ -484,5 +505,31 @@ public class UNOGame {
 	 */
 	public void setPile(CardPile pile) {
 		this.pile = pile;
+	}
+
+	/**
+	 * @param player
+	 * @param card
+	 * @return
+	 */
+	private ProceedResponse useCard(CardPlayer player, AbstractCard card) {
+		if (card instanceof ActionCard) {
+			forceProceed(card, false);
+			this.performAction(((ActionCard) card).getAction());
+		} else if (card instanceof WildCard) {
+			this.setCurrentCard(card);
+			// Every time a player plays a wild card, he must declare a
+			// color.
+
+			this.stage = GameStage.DECLARE_COLOR; // Let the player declare
+													// a
+													// card.
+			return ProceedResponse.COLOR_UNSPECIFIED;
+		} else
+			forceProceed(card, true);
+		this.stage = GameStage.SUSPEND; // Reset the game stage to
+										// SUSPEND.
+
+		return ProceedResponse.PLAYED;
 	}
 }
