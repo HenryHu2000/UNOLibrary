@@ -5,6 +5,7 @@ package net.mcplugin.unolib.control;
 
 import net.mcplugin.unolib.game.deck.AbstractCard;
 import net.mcplugin.unolib.game.deck.ActionCard;
+import net.mcplugin.unolib.game.deck.Color;
 import net.mcplugin.unolib.game.gametable.CardPlayer;
 import net.mcplugin.unolib.game.gametable.UNOGame;
 
@@ -12,22 +13,22 @@ import net.mcplugin.unolib.game.gametable.UNOGame;
  * @author Henry Hu
  *
  */
-public interface GameHandler {
+public interface ControllerHandler {
 	public void onAction(ActionCard card, CardPlayer invoker);
 
 	public void onCardChange(CardPlayer player, int change, int totalCards);
 
-	public void onCardNotExist(CardPlayer player, AbstractCard currentCard);
+	public AbstractCard onCardNotExist(CardPlayer player, AbstractCard currentCard);
 
-	public void onChooseColor(CardPlayer player);
+	public Color onChooseColor(CardPlayer player);
 
 	public void onDraw(CardPlayer player, int cardsNumber);
 
-	public void onDrawInTurn(CardPlayer player, AbstractCard cardDrawn);
+	public boolean onDrawInTurn(CardPlayer player, AbstractCard cardDrawn);
 
 	public void onEnd(CardPlayer winner);
 
-	public void onMismatch(CardPlayer player, AbstractCard currentCard);
+	public AbstractCard onMismatch(CardPlayer player, AbstractCard currentCard);
 
 	/**
 	 * This method is called when a player successfully plays a card.
@@ -56,8 +57,8 @@ public interface GameHandler {
 	 * @param player
 	 * @return the card to play in this turn, null for drawing a card
 	 */
-	public void onTurn(CardPlayer player, AbstractCard currentCard);
+	public AbstractCard onTurn(CardPlayer player, AbstractCard currentCard);
 
-	public void onUndeclaredColor(CardPlayer player, AbstractCard currentCard);
+	public AbstractCard onUndeclaredColor(CardPlayer player, AbstractCard currentCard);
 
 }

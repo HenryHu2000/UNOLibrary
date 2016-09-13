@@ -20,7 +20,7 @@ import net.mcplugin.unolib.game.deck.WildCard;
  */
 public class UNOGame {
 	private GameStage stage = GameStage.SUSPEND;
-	private final ArrayList<GamePlayer> playerList; // involves all players who
+	private final ArrayList<CardPlayer> playerList; // involves all players who
 	// join the card game
 	private CardPile pile = new CardPile(); // of cards used in game
 	private CardPile discardPile = new CardPile();
@@ -34,9 +34,12 @@ public class UNOGame {
 	 * @param playerList
 	 *            involves all players who join the card game
 	 */
-	public UNOGame(ArrayList<GamePlayer> playerList) {
+	public UNOGame(ArrayList<CardPlayer> playerList) {
 		// TODO Auto-generated constructor stub
 		this.playerList = playerList;
+		if (playerList.size() <= 1) {
+			throw new IllegalArgumentException("Too few players");
+		}
 		this.removeRepeatPlayer();
 		pile.initialize(); // Initialize the card pile
 		for (int i = 0; i < 7; i++) { // Deal the cards to each players
@@ -44,7 +47,7 @@ public class UNOGame {
 				this.getPlayer(playerNum).draw(pile);
 			}
 		}
-		this.start();
+		this.discardFirst();
 
 	}
 
@@ -62,12 +65,48 @@ public class UNOGame {
 	 * @param clockwise
 	 *            of the direction of the game
 	 */
-	public UNOGame(ArrayList<GamePlayer> playerList, int currentPlayerID, AbstractCard currentCard, boolean clockwise) {
+	public UNOGame(ArrayList<CardPlayer> playerList, int currentPlayerID, AbstractCard currentCard, boolean clockwise) {
 		this.playerList = playerList;
 		this.removeRepeatPlayer();
 		this.currentPlayerID = currentPlayerID;
 		this.currentCard = currentCard;
 		this.clockwise = clockwise;
+	}
+
+	/**
+	 * Start the game by discarding the top card on the pile.
+	 */
+	public void discardFirst() {
+		// Discard a card on the top of the pile.
+		currentCard = pile.pop();
+		getDiscardPile().push(currentCard);
+
+		if (currentCard instanceof WildCard) {
+			if (((WildCard) currentCard).isDrawFour()) {
+				reshuffle(); // Shuffle the pile because the card on top is a
+								// wild draw four.
+				this.discardFirst(); // Do the action of discarding the card on
+										// top
+				// again.
+				return;
+			} else {
+				// In order that the player can only use the wild card by
+				// declaring a color.
+				// The player can use the card which he is restricted to in the
+				// restrictive suspend stage,
+				// although he doesn't really have it.
+				getCurrentPlayer().setRestrictedCard(currentCard);
+				stage = GameStage.RESTRICTIVE_SUSPEND;
+				return;
+			}
+		} else if (currentCard instanceof ActionCard) {
+			this.performAction(((ActionCard) currentCard).getAction());
+			stage = GameStage.SUSPEND;
+			return;
+		} else
+			gotoNextPlayer(); // Simply goto the next player if the card is a
+								// normal number card.
+
 	}
 
 	/**
@@ -104,7 +143,7 @@ public class UNOGame {
 	/**
 	 * @return the currentPlayer
 	 */
-	public GamePlayer getCurrentPlayer() {
+	public CardPlayer getCurrentPlayer() {
 		return getPlayerList().get(currentPlayerID);
 	}
 
@@ -148,14 +187,27 @@ public class UNOGame {
 	 * @param playerID
 	 * @return
 	 */
-	public GamePlayer getPlayer(int playerID) {
+	public CardPlayer getPlayer(int playerID) {
 		return getPlayerList().get(playerID);
+	}
+
+	/**
+	 * @param player
+	 *            to find
+	 * @return the ID of the player, return -1 if player is not found.
+	 */
+	public int getPlayerID(CardPlayer player) {
+		for (int i = 0; i < playerList.size(); i++) {
+			if (playerList.get(i) == player)
+				return i;
+		}
+		return -1;
 	}
 
 	/**
 	 * @return the playerList
 	 */
-	public ArrayList<GamePlayer> getPlayerList() {
+	public ArrayList<CardPlayer> getPlayerList() {
 		return playerList;
 	}
 
@@ -273,7 +325,7 @@ public class UNOGame {
 				forceProceed(card, true);
 			this.stage = GameStage.SUSPEND; // Reset the game stage to
 											// SUSPEND.
-			return ProceedResponse.PLAYED;
+			return ProceedResponse.PLAYED_DRAWN;
 
 		case SUSPEND:
 			if (!getCurrentPlayer().getHand().contains(card)) {
@@ -340,7 +392,7 @@ public class UNOGame {
 				forceProceed(card, true);
 			this.stage = GameStage.SUSPEND; // Recover the game stage to
 											// suspend.
-			return ProceedResponse.PLAYED;
+			return ProceedResponse.PLAYED_DRAWN;
 
 		case SUSPEND:
 			if (!getCurrentPlayer().getHand().contains(card)) {
@@ -432,40 +484,5 @@ public class UNOGame {
 	 */
 	public void setPile(CardPile pile) {
 		this.pile = pile;
-	}
-
-	/**
-	 * Start the game by discarding the top card on the pile.
-	 */
-	public void start() {
-		// Discard a card on the top of the pile.
-		currentCard = pile.pop();
-		getDiscardPile().push(currentCard);
-
-		if (currentCard instanceof WildCard) {
-			if (((WildCard) currentCard).isDrawFour()) {
-				reshuffle(); // Shuffle the pile because the card on top is a
-								// wild draw four.
-				this.start(); // Do the action of discarding the card on top
-								// again.
-				return;
-			} else {
-				// In order that the player can only use the wild card by
-				// declaring a color.
-				// The player can use the card which he is restricted to in the
-				// restrictive suspend stage,
-				// although he doesn't really have it.
-				getCurrentPlayer().setRestrictedCard(currentCard);
-				stage = GameStage.RESTRICTIVE_SUSPEND;
-				return;
-			}
-		} else if (currentCard instanceof ActionCard) {
-			this.performAction(((ActionCard) currentCard).getAction());
-			stage = GameStage.SUSPEND;
-			return;
-		} else
-			gotoNextPlayer(); // Simply goto the next player if the card is a
-								// normal number card.
-
 	}
 }

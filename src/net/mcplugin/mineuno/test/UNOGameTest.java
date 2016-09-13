@@ -16,7 +16,7 @@ import net.mcplugin.unolib.game.deck.AbstractCard;
 import net.mcplugin.unolib.game.deck.ActionType;
 import net.mcplugin.unolib.game.deck.Color;
 import net.mcplugin.unolib.game.deck.WildCard;
-import net.mcplugin.unolib.game.gametable.GamePlayer;
+import net.mcplugin.unolib.game.gametable.CardPlayer;
 import net.mcplugin.unolib.game.gametable.UNOGame;
 
 public class UNOGameTest {
@@ -37,14 +37,14 @@ public class UNOGameTest {
 	@Before
 	public void setUp() throws Exception {
 		playersNumber = 4;
-		ArrayList<GamePlayer> playerList = new ArrayList<GamePlayer>();
+		ArrayList<CardPlayer> playerList = new ArrayList<CardPlayer>();
 		for (int i = 0; i < playersNumber; i++) {
-			playerList.add(new GamePlayer(Integer.toString(i)));
+			playerList.add(new CardPlayer(Integer.toString(i)));
 		}
 
 		game = new UNOGame(playerList);
 		totalCardsNumber = game.getPile().size() + game.getDiscardPile().size();
-		for (GamePlayer player : game.getPlayerList()) {
+		for (CardPlayer player : game.getPlayerList()) {
 			totalCardsNumber += player.getCardsNumber();
 		}
 	}
@@ -57,7 +57,7 @@ public class UNOGameTest {
 	public void testForceProceed() {
 		for (int i = 0; i < playersNumber; i++) {
 			game.setCurrentPlayerID(i);
-			GamePlayer nextPlayer = game.getPlayer(game.getNextPlayerID(game.getCurrentPlayerID()));
+			CardPlayer nextPlayer = game.getPlayer(game.getNextPlayerID(game.getCurrentPlayerID()));
 			AbstractCard card = game.getCurrentPlayer().getHand().get(0);
 			game.forceProceed(card, true);
 			assertEquals("Correct next player", nextPlayer, game.getCurrentPlayer());
@@ -85,7 +85,7 @@ public class UNOGameTest {
 	public void testGotoNextPlayer() {
 		for (int i = 0; i < playersNumber; i++) {
 			game.setCurrentPlayerID(i);
-			GamePlayer player = game.getCurrentPlayer();
+			CardPlayer player = game.getCurrentPlayer();
 			game.gotoNextPlayer();
 			game.gotoNextPlayer();
 			game.setClockwise(!game.isClockwise());
@@ -111,7 +111,7 @@ public class UNOGameTest {
 				game.getPlayer(game.getNextPlayerID(game.getCurrentPlayerID())).getCardsNumber());
 
 		totalCardsNumber = game.getPile().size() + game.getDiscardPile().size();
-		for (GamePlayer player : game.getPlayerList()) {
+		for (CardPlayer player : game.getPlayerList()) {
 			totalCardsNumber += player.getCardsNumber();
 		}
 		assertEquals("Currect total card number in game", 108, totalCardsNumber);
@@ -135,9 +135,9 @@ public class UNOGameTest {
 
 	@Test
 	public void testRemoveRepeatPlayer() {
-		ArrayList<GamePlayer> playerList = new ArrayList<GamePlayer>();
-		GamePlayer firstPlayer = new GamePlayer("1");
-		GamePlayer secondPlayer = new GamePlayer("2");
+		ArrayList<CardPlayer> playerList = new ArrayList<CardPlayer>();
+		CardPlayer firstPlayer = new CardPlayer("1");
+		CardPlayer secondPlayer = new CardPlayer("2");
 		for (int i = 0; i < playersNumber; i++) {
 			playerList.add(firstPlayer);
 			playerList.add(secondPlayer);
@@ -159,7 +159,7 @@ public class UNOGameTest {
 	public void testUNOGame() {
 		System.out.println("Cards in players' hand:");
 		int differentCardsNum = 0;
-		for (GamePlayer player : game.getPlayerList()) {
+		for (CardPlayer player : game.getPlayerList()) {
 			System.out.println(player.getCardNames());
 			assertEquals("Correct number of players", playersNumber, game.getPlayersNumber());
 			if (player.getCardsNumber() == 8 || player.getCardsNumber() == 9) {
@@ -176,13 +176,13 @@ public class UNOGameTest {
 		System.out.println(game.getCurrentCard());
 
 		totalCardsNumber = game.getPile().size() + game.getDiscardPile().size();
-		for (GamePlayer player : game.getPlayerList()) {
+		for (CardPlayer player : game.getPlayerList()) {
 			totalCardsNumber += player.getCardsNumber();
 		}
 		assertEquals("Currect total card number in game", 108, totalCardsNumber);
 		if (game.getCurrentCard() instanceof WildCard) {
 			game.proceed((WildCard) game.getCurrentCard(), Color.GREEN);
-			for (GamePlayer player : game.getPlayerList()) {
+			for (CardPlayer player : game.getPlayerList()) {
 				totalCardsNumber += player.getCardsNumber();
 			}
 			assertEquals("Currect total card number in game after proceed", 108, totalCardsNumber);
